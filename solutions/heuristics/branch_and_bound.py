@@ -6,7 +6,7 @@ from loguru import logger
 class BranchAndBound:
     def __init__(self, lb=0):
         self.lb = lb
-        
+
         self.best_clique = []
         self.cur_max = 0
 
@@ -18,13 +18,13 @@ class BranchAndBound:
             return
 
         while len(U) > 0:
-            if size + len(U) <= self.cur_max: # pruning 4
+            if size + len(U) <= self.cur_max:  # pruning 4
                 return
 
             vertex = U.pop()
             new_cur_clique = cur_clique[:]
             new_cur_clique.append(vertex)
-            
+
             # pruning 5
             neib_vertex = set(v for v in graph[vertex] if len(graph[v]) >= self.cur_max)
             new_U = U.intersection(neib_vertex)
@@ -43,25 +43,24 @@ class BranchAndBound:
             neib_vi = graph[str(i)]
 
             # pruning 1
-            if len(neib_vi) >= self.cur_max: 
+            if len(neib_vi) >= self.cur_max:
                 U = set()
                 cur_clique = [str(i)]
 
                 for j in neib_vi:
                     # pruning 2
-                    if int(j) > i: 
+                    if int(j) > i:
                         # pruning 3
-                        if len(graph[j]) >= self.cur_max: 
+                        if len(graph[j]) >= self.cur_max:
                             U.add(j)
 
                 self.Clique(graph, U, 1, cur_clique)
-
 
     def run(self, graph):
         start_time = time.time()
         self.MaxClique(graph, self.lb)
         end_time = time.time()
-        
+
         s = self.cur_max
         t = (end_time - start_time) * 1000
 
