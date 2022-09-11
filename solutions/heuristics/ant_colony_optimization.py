@@ -6,11 +6,64 @@ from multiprocessing import Pool
 import numpy as np
 from loguru import logger
 
+from solutions.exact_solution.test_instances import test_graph1
+
 random.seed(0)
 np.random.seed(0)
 
 
+def read_graph(graph_loc, backtrack=False):
+    """Reads dimacs styled graphs"""
+    graph_adj = {}
+    with open(graph_loc) as f:
+        for i, line in enumerate(f):
+            if i == 0:
+                logger.info(f'Reading graph: {" ".join(line.strip().split()[1:])}')
+            elif line.startswith('p'):
+                _, _, vertices_num, edges_num = line.split()
+                logger.info(f'Vertices: {vertices_num}, Edges: {edges_num}')
+            elif line.startswith('e'):
+                _, v1, v2 = line.split()
+                if v1 == v2:
+                    continue
+
+                if v1 not in graph_adj:
+                    graph_adj[v1] = {}
+                if v2 not in graph_adj:
+                    graph_adj[v2] = {}
+
+                l = graph_adj[v1].get(v2, {})
+                graph_adj[v1][v2] = l
+                graph_adj[v2][v1] = l
+            else:
+                continue
+    
+    if backtrack:
+        with open(graph_loc) as f:
+            lines = [line for line in f.readlines()]
+
+        p_line = [line for line in lines if line[0] == "p"][0]
+        e_lines = [line for line in lines if line[0] == "e"]
+        n = int(p_line[2])
+        return (np.array(graph_adj), n, len(e_lines))
+    
+    return graph_adj
+
+
 class AntClique:
+    """
+    Ant Colony Optimization Algorithm is a probabilistic technique for solving computational problems which can be
+    reduced to finding good paths through graphs.
+    
+    :param int num_ants: Number of ants to be used in graph search.
+    :param float taomin: Min pheromone trail. The amount of pheromone trail is propotional to the utility, as estimated
+    by the ants, of using that are to build good solutions.
+    :param float taomax: Max pheromone trail.The amount of pheromone trail is propotional to the utility, as estimated
+    by the ants, of using that are to build good solutions.
+    :param int alpha: The value 2 of alpha derived from experiments on trail following. (<= 0 alpha <= 2)
+    :param float rho: Higher values of rho leads to faster evaporation (evaporation coefficient).
+    :param int max_cycles: Max number of iteration to run the application.
+    """
     def __init__(
         self, num_ants=7, taomin=0.01, taomax=4, alpha=2, rho=0.995, max_cycles=3000
     ):
@@ -25,6 +78,11 @@ class AntClique:
         self.best_clique_info = None
 
     def initialize_pheromone_trails(self, graph):
+        """
+        Initialization of ACO algorithm.
+        
+        :param graph: Graph where cliques will be searched.
+        """
         self.graph = copy.deepcopy(graph)
         self.best_clique_info = {
             "clique": set(),
@@ -123,3 +181,10 @@ class AntClique:
 
         logger.info(f"clique size: {s}, req cycles: {c}, req time(ms): {t:.3f}")
         return (s, t, c)
+
+
+if __name__ == "__main__":
+    graph = read_graph("/media/rebellion/LORDS_BLADE/python/mestrado/aed/ppca-aed-projeto-final/dimacs_benchmark_set/abhik1505040_max_clique_implementations/anna.col")
+    aco = AntClique()
+    s, t, c = aco.run(graph)
+    print(s, t, c)

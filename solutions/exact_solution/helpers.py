@@ -148,7 +148,8 @@ def is_solution(nodes_list, adj_mat, v=None):
 
 def cliques_from_list(nodes_list, v=None):
     """
-    Takes the list X = [1 1 2 3 3 ... ] of nodes containing the label of their associated clique, and returns a dict of the different cliques
+    Takes the list X = [1 1 2 3 3 ... ] of nodes containing the label of their associated clique, and returns a dict of
+    the different cliques
     """
 
     if v is None:
