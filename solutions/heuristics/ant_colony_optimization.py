@@ -6,8 +6,6 @@ from multiprocessing import Pool
 import numpy as np
 from loguru import logger
 
-from solutions.exact_solution.test_instances import test_graph1
-
 random.seed(0)
 np.random.seed(0)
 
@@ -15,15 +13,18 @@ np.random.seed(0)
 def read_graph(graph_loc, backtrack=False):
     """Reads dimacs styled graphs"""
     graph_adj = {}
+
     with open(graph_loc) as f:
         for i, line in enumerate(f):
             if i == 0:
                 logger.info(f'Reading graph: {" ".join(line.strip().split()[1:])}')
             elif line.startswith('p'):
                 _, _, vertices_num, edges_num = line.split()
+                adjmat = np.zeros(shape=(int(vertices_num)+1, int(vertices_num)+1))
                 logger.info(f'Vertices: {vertices_num}, Edges: {edges_num}')
             elif line.startswith('e'):
                 _, v1, v2 = line.split()
+                adjmat[int(v1)][int(v2)] = 1
                 if v1 == v2:
                     continue
 
@@ -39,14 +40,8 @@ def read_graph(graph_loc, backtrack=False):
                 continue
     
     if backtrack:
-        with open(graph_loc) as f:
-            lines = [line for line in f.readlines()]
+        return np.array(adjmat)
 
-        p_line = [line for line in lines if line[0] == "p"][0]
-        e_lines = [line for line in lines if line[0] == "e"]
-        n = int(p_line[2])
-        return (np.array(graph_adj), n, len(e_lines))
-    
     return graph_adj
 
 
@@ -181,10 +176,3 @@ class AntClique:
 
         logger.info(f"clique size: {s}, req cycles: {c}, req time(ms): {t:.3f}")
         return (s, t, c)
-
-
-if __name__ == "__main__":
-    graph = read_graph("/media/rebellion/LORDS_BLADE/python/mestrado/aed/ppca-aed-projeto-final/dimacs_benchmark_set/abhik1505040_max_clique_implementations/anna.col")
-    aco = AntClique()
-    s, t, c = aco.run(graph)
-    print(s, t, c)

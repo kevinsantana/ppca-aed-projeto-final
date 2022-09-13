@@ -4,7 +4,7 @@
 Projeto final da disciplina Algoritmos e Estrutura de Dados do Programa de Pós-Graduação em Computação Aplicada (PPCA) da Universidade de Brasília (UnB).
 
 (EN-US :us:)
-Final project of Data Structure and Algorithms Class on the Applied Coputation Post-Graduation Program of Universidade de Brasília (UnB).
+Final project of Data Structure and Algorithms Class on the Applied Computation Post-Graduation Program of Universidade de Brasília (UnB).
 
 ## Graph Format
 

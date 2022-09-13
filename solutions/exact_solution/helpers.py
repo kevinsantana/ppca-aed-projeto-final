@@ -4,35 +4,6 @@ from itertools import combinations
 import numpy as np
 
 
-def load_graph(file):
-    """
-    Loads a graph from a .clq (DIMACS) file
-    """
-    with open(file) as f:
-        lines = [line for line in f.readlines()]
-    
-    lines = [line.strip().split() for line in lines if line.strip().split() != []]
-    p_line = [line for line in lines if line[0] == "p"][0]
-    e_lines = [line for line in lines if line[0] == "e"]
-    n = int(p_line[2])
-    print("Number of vertices:", n)
-    print("Number of edges:", len(e_lines))
-    adjmat = [[0] * n for _ in range(len(e_lines))]
-    
-    for e in e_lines:
-        v, w = int(e[1]), int(e[2])
-
-        if v == w:
-            print("Loop detected"), v
-
-        if adjmat[v][w]:
-            print("Duplicate edge"), v, w
-
-        adjmat[v][w] = adjmat[v][w] = 1
-
-    return (np.array(adjmat), n, len(e_lines))
-
-
 def make_matrix(rows: int, columns: int, entries):
     """
     Creates a adj matrix from user entry
@@ -189,9 +160,3 @@ def main():
     )
     args = parser.parse_args()
     make_matrix(args.rows, args.columns, args.entries)
-
-
-if __name__ == "__main__":
-    a = load_graph("/media/rebellion/LORDS_BLADE/python/mestrado/aed/ppca-aed-projeto-final/dimacs_benchmark_set/second_dimacs_implementation_challenge/C125.9.clq")
-    print(a)
-    # main()
