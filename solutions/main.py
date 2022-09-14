@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
+from solutions.exact_solution.backtracking import backtrack
 from solutions.heuristics.ant_colony_optimization import AntClique, read_graph
 
 
@@ -59,7 +60,7 @@ def parse_input_args():
     root_parser.add_argument(
         "--time-limit",
         dest="time_limit",
-        help="time limit for each graph run(s).",
+        help="time limit for each graph run(s) in seconds.",
         type=int,
         default=1200,
     )
@@ -104,14 +105,22 @@ def parse_input_args():
 
     # options for backtracking
     parser_backt = subparsers.add_parser(
-        "backt", help="Use backtracking algorithm", parents=[root_parser]
+        "backtrack", help="Use backtracking algorithm", parents=[root_parser]
     )
     parser_backt.add_argument("--graph", dest="graph", help="test_graph")
+    parser_backt.add_argument(
+        "--runs_per_graph",
+        dest="runs_per_graph",
+        help="runs_per_graph",
+        type=int,
+        default=3,
+    )
 
     return parser.parse_args()
 
 
 def main(args):
+    print(args)
     files, results = [], []
     if args.input_dir:
         root_dirs = glob.glob("../dimacs_benchmark_set" + "/*")
@@ -121,7 +130,7 @@ def main(args):
     elif args.input_path:
         files = [args.input_path]
     
-    output_path = f"{args.output_path}/{args.method}_{len(files)}_graphs.csv"
+    output_path = f"{args.output_prefix}/{args.method}_{len(files)}_graphs.csv"
 
     if args.method == "aco":
         obj = AntClique(
@@ -153,6 +162,38 @@ def main(args):
                 "filename": [f],
                 "size->mean(stdev)": [f"{np.mean(sizes):.4f}({np.std(sizes):.4f})"],
                 "time->mean(stdev)": [f"{np.mean(times):.4f}({np.std(times):.4f})"],
+                "cycles->mean(stdev)": [f"{np.mean(cycles):.4f}({np.std(cycles):.4f})"],
+            }
+            log_msg = "Final results-> " + ", ".join(
+                f"{k}: {v[0]}" for k, v in out_json.items()
+            )
+
+            results.append(pd.DataFrame(out_json))
+            logger.info(log_msg)
+            print("\n")
+            
+    elif args.method == "backtrack":
+        for f in files:
+            graph = read_graph(f, backtrack=True)
+            cliques = [0 for x in range(graph.shape[0])]
+            cliques[0] = 1
+            outputs = []
+            for i in range(args.runs_per_graph):
+                logger.info(f"Run {i}")
+                try:
+                    with time_limit(args.time_limit):
+                        solution = backtrack(graph, cliques, 1)
+                        outputs.append(solution)
+                except TimeoutException:
+                    logger.info("Execution timed out!")
+                    continue
+
+            sizes = [o[0] for o in outputs]
+            cycles = [o[1] for o in outputs]
+
+            out_json = {
+                "filename": [f],
+                "size->mean(stdev)": [f"{np.mean(sizes):.4f}({np.std(sizes):.4f})"],
                 "cycles->mean(stdev)": [f"{np.mean(cycles):.4f}({np.std(cycles):.4f})"],
             }
             log_msg = "Final results-> " + ", ".join(

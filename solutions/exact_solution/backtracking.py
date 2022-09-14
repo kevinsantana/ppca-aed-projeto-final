@@ -1,6 +1,6 @@
 import math
 
-from helpers import cliques_from_list, is_solution
+from solutions.exact_solution.helpers import cliques_from_list, is_solution
 
 
 def backtrack(adj_mat, cliques, v=1, best=(math.inf, None)):
