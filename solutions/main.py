@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-from solutions.exact_solution.backtracking import backtrack
+from solutions.exact_solution.greedy import greedy_search
 from solutions.heuristics.ant_colony_optimization import AntClique, read_graph
 
 
@@ -105,7 +105,7 @@ def parse_input_args():
 
     # options for backtracking
     parser_backt = subparsers.add_parser(
-        "backtrack", help="Use backtracking algorithm", parents=[root_parser]
+        "greedy", help="Use greedy search algorithm", parents=[root_parser]
     )
     parser_backt.add_argument("--graph", dest="graph", help="test_graph")
     parser_backt.add_argument(
@@ -129,7 +129,7 @@ def main(args):
                 files.append(f"{dir}/{file}")
     elif args.input_path:
         files = [args.input_path]
-    
+
     output_path = f"{args.output_prefix}/{args.method}_{len(files)}_graphs.csv"
 
     if args.method == "aco":
@@ -171,10 +171,10 @@ def main(args):
             results.append(pd.DataFrame(out_json))
             logger.info(log_msg)
             print("\n")
-            
-    elif args.method == "backtrack":
+
+    elif args.method == "greedy":
         for f in files:
-            graph = read_graph(f, backtrack=True)
+            graph = read_graph(f)
             cliques = [0 for x in range(graph.shape[0])]
             cliques[0] = 1
             outputs = []
@@ -182,7 +182,7 @@ def main(args):
                 logger.info(f"Run {i}")
                 try:
                     with time_limit(args.time_limit):
-                        solution = backtrack(graph, cliques, 1)
+                        solution = greedy_search(graph, cliques, 1)
                         outputs.append(solution)
                 except TimeoutException:
                     logger.info("Execution timed out!")
@@ -203,7 +203,6 @@ def main(args):
             results.append(pd.DataFrame(out_json))
             logger.info(log_msg)
             print("\n")
-
 
     combined_results = pd.concat(results)
     combined_results.to_csv(output_path, index=False)

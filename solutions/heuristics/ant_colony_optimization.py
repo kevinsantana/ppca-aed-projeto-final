@@ -10,7 +10,7 @@ random.seed(0)
 np.random.seed(0)
 
 
-def read_graph(graph_loc, backtrack=False):
+def read_graph(graph_loc):
     """Reads dimacs styled graphs"""
     graph_adj = {}
 
@@ -18,18 +18,18 @@ def read_graph(graph_loc, backtrack=False):
         for i, line in enumerate(f):
             if i == 0:
                 logger.info(f'Reading graph: {" ".join(line.strip().split()[1:])}')
-            elif line.startswith('p'):
+            elif line.startswith("p"):
                 _, _, vertices_num, edges_num = line.split()
-                adjmat = np.zeros(shape=(int(vertices_num)+1, int(vertices_num)+1))
-                logger.info(f'Vertices: {vertices_num}, Edges: {edges_num}')
-            elif line.startswith('e'):
+                logger.info(f"Vertices: {vertices_num}, Edges: {edges_num}")
+            elif line.startswith("e"):
                 _, v1, v2 = line.split()
-                adjmat[int(v1)][int(v2)] = 1
+
                 if v1 == v2:
                     continue
 
                 if v1 not in graph_adj:
                     graph_adj[v1] = {}
+
                 if v2 not in graph_adj:
                     graph_adj[v2] = {}
 
@@ -38,9 +38,6 @@ def read_graph(graph_loc, backtrack=False):
                 graph_adj[v2][v1] = l
             else:
                 continue
-    
-    if backtrack:
-        return np.array(adjmat)
 
     return graph_adj
 
@@ -49,7 +46,7 @@ class AntClique:
     """
     Ant Colony Optimization Algorithm is a probabilistic technique for solving computational problems which can be
     reduced to finding good paths through graphs.
-    
+
     :param int num_ants: Number of ants to be used in graph search.
     :param float taomin: Min pheromone trail. The amount of pheromone trail is propotional to the utility, as estimated
     by the ants, of using that are to build good solutions.
@@ -59,6 +56,7 @@ class AntClique:
     :param float rho: Higher values of rho leads to faster evaporation (evaporation coefficient).
     :param int max_cycles: Max number of iteration to run the application.
     """
+
     def __init__(
         self, num_ants=7, taomin=0.01, taomax=4, alpha=2, rho=0.995, max_cycles=3000
     ):
@@ -75,7 +73,7 @@ class AntClique:
     def initialize_pheromone_trails(self, graph):
         """
         Initialization of ACO algorithm.
-        
+
         :param graph: Graph where cliques will be searched.
         """
         self.graph = copy.deepcopy(graph)
