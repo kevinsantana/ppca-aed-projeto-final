@@ -21,3 +21,25 @@ to the second vertex.
     e 1 2
 
 ### Run
+
+1. Install dependencies with
+
+```bash
+pip install -e .
+```
+
+2. Execute [ppca_aed_projeto_final](ppca_aed_projeto_final), a simple usage can be achieved with
+
+```bash
+python ppca_aed_projeto_final aco --input-dir dimacs_benchmark_set
+```
+
+Where the first argument `aco` represents the method to find a maximum clique. Avalaible options are:
+
+| Argument    | Method |
+| ----------- | ----------------------- |
+| aco         | Ant Colony Optimization |
+| bnb         | Branch and Bound        |
+| greedy      | Greedy Search           |
+
+Second argument `input-dir` where to find the tests graphs.

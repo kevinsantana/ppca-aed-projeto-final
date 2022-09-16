@@ -44,7 +44,7 @@ def parse_input_args():
         dest="input_path",
         help="Input path for single file",
         default=os.path.join(
-            "../dimacs_benchmark_set/abhik1505040_max_clique_implementations",
+            "dimacs_benchmark_set/abhik1505040_max_clique_implementations",
             "anna.col",
         ),
     )
@@ -54,7 +54,7 @@ def parse_input_args():
         "--output-prefix",
         dest="output_prefix",
         help="Output path for reports.",
-        default="../results",
+        default="results",
     )
 
     root_parser.add_argument(
@@ -120,10 +120,9 @@ def parse_input_args():
 
 
 def main(args):
-    print(args)
     files, results = [], []
     if args.input_dir:
-        root_dirs = glob.glob("../dimacs_benchmark_set" + "/*")
+        root_dirs = glob.glob("dimacs_benchmark_set" + "/*")
         for dir in root_dirs:
             for file in os.listdir(dir):
                 files.append(f"{dir}/{file}")
@@ -206,8 +205,3 @@ def main(args):
 
     combined_results = pd.concat(results)
     combined_results.to_csv(output_path, index=False)
-
-
-if __name__ == "__main__":
-    args = parse_input_args()
-    main(args)

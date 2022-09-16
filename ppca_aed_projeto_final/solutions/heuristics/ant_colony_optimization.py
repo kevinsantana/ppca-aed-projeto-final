@@ -116,7 +116,7 @@ class AntClique:
             clique.add(selected_vertex)
             candidates = candidates.intersection(neigbors(selected_vertex))
 
-        return (ant_idx, clique)
+        return ant_idx, clique
 
     def update_pheromone_trails(self, iteration_no, start_time, cliques):
         best_ant_idx, best_clique = max(cliques, key=lambda t: len(t[1]))
