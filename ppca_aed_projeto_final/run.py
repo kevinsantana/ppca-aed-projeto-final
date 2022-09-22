@@ -129,9 +129,12 @@ def main(args):
     elif args.input_path:
         files = [args.input_path]
 
-    output_path = f"{args.output_prefix}/{args.method}_{len(files)}_graphs.csv"
+    output_path = f"ppca_aed_projeto_final/{args.output_prefix}/{args.method}_{len(files)}_graphs.csv"
 
     if args.method == "aco":
+        import ipdb
+
+        ipdb.set_trace()
         obj = AntClique(
             args.num_ants,
             args.taomin,
@@ -174,25 +177,25 @@ def main(args):
     elif args.method == "greedy":
         for f in files:
             graph = read_graph(f)
-            cliques = [0 for x in range(graph.shape[0])]
-            cliques[0] = 1
             outputs = []
             for i in range(args.runs_per_graph):
                 logger.info(f"Run {i}")
                 try:
                     with time_limit(args.time_limit):
-                        solution = greedy_search(graph, cliques, 1)
+                        solution = greedy_search(graph)
                         outputs.append(solution)
                 except TimeoutException:
                     logger.info("Execution timed out!")
                     continue
 
             sizes = [o[0] for o in outputs]
-            cycles = [o[1] for o in outputs]
+            times = [o[1] for o in outputs]
+            cycles = [o[2] for o in outputs]
 
             out_json = {
                 "filename": [f],
                 "size->mean(stdev)": [f"{np.mean(sizes):.4f}({np.std(sizes):.4f})"],
+                "time->mean(stdev)": [f"{np.mean(times):.4f}({np.std(times):.4f})"],
                 "cycles->mean(stdev)": [f"{np.mean(cycles):.4f}({np.std(cycles):.4f})"],
             }
             log_msg = "Final results-> " + ", ".join(

@@ -1,0 +1,2 @@
+filename,size->mean(stdev),time->mean(stdev),cycles->mean(stdev)
+dimacs_benchmark_set/abhik1505040_max_clique_implementations/anna.col,5.3333(0.4714),0.0403(0.0013),137.0000(0.0000)

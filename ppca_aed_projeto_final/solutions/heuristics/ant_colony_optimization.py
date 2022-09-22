@@ -119,7 +119,7 @@ class AntClique:
         return ant_idx, clique
 
     def update_pheromone_trails(self, iteration_no, start_time, cliques):
-        best_ant_idx, best_clique = max(cliques, key=lambda t: len(t[1]))
+        _, best_clique = max(cliques, key=lambda t: len(t[1]))
 
         # update global info
         if len(best_clique) > len(self.best_clique_info["clique"]):
@@ -173,4 +173,5 @@ class AntClique:
         c = self.best_clique_info["req_cycles"]
 
         logger.info(f"clique size: {s}, req cycles: {c}, req time(ms): {t:.3f}")
-        return (s, t, c)
+        return self.best_clique_info["clique"]
+        # return (s, t, c)
