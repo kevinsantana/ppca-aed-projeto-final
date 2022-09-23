@@ -11,7 +11,11 @@ np.random.seed(0)
 
 
 def read_graph(graph_loc):
-    """Reads dimacs styled graphs"""
+    """
+    Reads dimacs styled graphs
+    
+    :param str graph_loc: Location on disk of the dimacs graph file to be read.
+    """
     graph_adj = {}
 
     with open(graph_loc) as f:
@@ -173,5 +177,4 @@ class AntClique:
         c = self.best_clique_info["req_cycles"]
 
         logger.info(f"clique size: {s}, req cycles: {c}, req time(ms): {t:.3f}")
-        return self.best_clique_info["clique"]
-        # return (s, t, c)
+        return (s, t, c)

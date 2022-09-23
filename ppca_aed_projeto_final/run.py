@@ -9,8 +9,11 @@ import numpy as np
 import pandas as pd
 from loguru import logger
 
-from solutions.exact_solution.greedy import greedy_search
+from ppca_aed_projeto_final.solutions.heuristics.greedy import greedy_search
 from solutions.heuristics.ant_colony_optimization import AntClique, read_graph
+from ppca_aed_projeto_final.solutions.exact_solution.branch_and_bound import (
+    BranchAndBound,
+)
 
 
 class TimeoutException(Exception):
@@ -132,9 +135,6 @@ def main(args):
     output_path = f"ppca_aed_projeto_final/{args.output_prefix}/{args.method}_{len(files)}_graphs.csv"
 
     if args.method == "aco":
-        import ipdb
-
-        ipdb.set_trace()
         obj = AntClique(
             args.num_ants,
             args.taomin,
@@ -165,6 +165,32 @@ def main(args):
                 "size->mean(stdev)": [f"{np.mean(sizes):.4f}({np.std(sizes):.4f})"],
                 "time->mean(stdev)": [f"{np.mean(times):.4f}({np.std(times):.4f})"],
                 "cycles->mean(stdev)": [f"{np.mean(cycles):.4f}({np.std(cycles):.4f})"],
+            }
+            log_msg = "Final results-> " + ", ".join(
+                f"{k}: {v[0]}" for k, v in out_json.items()
+            )
+
+            results.append(pd.DataFrame(out_json))
+            logger.info(log_msg)
+            print("\n")
+
+    elif args.method == "bnb":
+        obj = BranchAndBound(args.lb)
+
+        for f in files:
+            graph = read_graph(f)
+
+            try:
+                with time_limit(args.time_limit):
+                    size, time = obj.run(graph)
+            except TimeoutException:
+                logger.info("Execution timed out!")
+                continue
+
+            out_json = {
+                "filename": [f],
+                "size": [f"{size:.4f}"],
+                "time": [f"{time:.4f}"],
             }
             log_msg = "Final results-> " + ", ".join(
                 f"{k}: {v[0]}" for k, v in out_json.items()
